@@ -1,13 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Collapse, List, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import { StarBorder, ExpandLess, ExpandMore, MoveToInbox } from "@material-ui/icons";
-import { Context } from "../../index";
 
 export default function Tag() {
     const [visibility, setVisibility] = useState(false);
-    const { tagSideBarWidth } = useContext(Context);
     return (
-        <div style={{ height: "100%", width: tagSideBarWidth, backgroundColor: "yellow", overflow: "hidden" }}>
+        <div style={{ height: "100%", width: "100%", backgroundColor: "yellow", overflow: "hidden" }}>
             <ListItem button onClick={() => setVisibility(visibility => !visibility)}>
                 <ListItemIcon>
                     <MoveToInbox />
