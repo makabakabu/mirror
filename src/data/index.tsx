@@ -1,6 +1,3 @@
-import { getWidth, getHeight } from "../logic/";
+import * as Constant from "./constant";
 
-const width = getWidth();
-const height = getHeight();
-
-export { width, height };
+export { Constant };

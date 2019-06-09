@@ -5,11 +5,17 @@
   "dependencies": {
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
+    "@types/draft-js": "^0.10.30",
+    "draft-js": "^0.10.5",
     "little_bit": "^1.0.9",
     "lodash": "^4.17.11",
     "react": "^16.8.6",
+    "react-autocomplete": "^1.8.1",
     "react-dom": "^16.8.6",
+    "react-dropzone": "^10.1.4",
+    "react-rnd": "^9.1.2",
     "react-scripts": "3.0.0",
+    "react-split-pane": "^0.1.87",
     "typescript": "3.4.5"
   },
   "scripts": {
@@ -38,10 +44,12 @@
     "@types/lodash": "^4.14.123",
     "@types/node": "^11.13.8",
     "@types/react": "^16.8.15",
+    "@types/react-autocomplete": "^1.8.5",
     "@types/react-dom": "^16.8.4",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
     "eslint": "^5.16.0",
+    "eslint-config-react-app": "^4.0.1",
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-hooks": "^1.6.0"
   }

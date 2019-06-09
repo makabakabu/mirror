@@ -1,4 +1,9 @@
+
 function getWidth() {
+    {
+        let a = 2;
+        console.log(a);
+    }
     return Math.max(
         document.body.scrollWidth,
         document.documentElement.scrollWidth,
@@ -17,5 +22,7 @@ function getHeight() {
         document.documentElement.clientHeight
     );
 }
+
+getWidth();
 
 export { getWidth, getHeight };
