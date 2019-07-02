@@ -1,10 +1,24 @@
-export interface State {
-    filter: {
-        area: string[];
-        functionType: Array<functionType>;
-        tag: string[];
-        containText: string[];
+interface Area {
+    location: {
+        position: { // 相对于底图
+            left: number; // 百分比
+            top: number; // 百分比
+        };
+        size: { // 相对于底图
+            width: number; // 百分比
+            height: number; // 百分比
+        };
     };
+    children?: {
+        [key: string]: Area,
+    }
+    content: [{
+        type: "buriedPoint" | "ABTestCode" | "data" | "productLogic" | "UIAndUX" | "jumpLink";
+        keyList: string[]; // 同一个类型下面所有的数据
+    }];
+}
+
+export interface State {
     background?: {
         position: {
             left: number;
@@ -16,37 +30,22 @@ export interface State {
         };
         url: string; // url
     };
-    area: {
-        [key: string]: {
-            location: {
-                position: { // 相对于底图
-                    left: number; // 百分比
-                    top: number; // 百分比
-                };
-                size: { // 相对于底图
-                    width: number; // 百分比
-                    height: number; // 百分比
-                };
-            };
-            children: [{
-                type: "buriedPoint" | "ABTestCode" | "data" | "productLogic" | "UIAndUX" | "jumpLink" | "testCase";
-                keyList: string[]; // 同一个类型下面所有的数据
-            }];
-        };
+    区域: {
+        [key: string]: Area,
     };
-    buriedPoint: {
+    埋点: {
         [key: string]: {
             tagList: string[];
             content: HTMLElement;
         };
     };
-    ABTestCode: {
+    AB测试号: {
         [key: string]: {
             tagList: string[];
             content: HTMLElement;
         };
     };
-    data: {
+    数据: {
         [key: string]: {
             tagList: string[];
             content: {
@@ -56,25 +55,19 @@ export interface State {
             };
         };
     };
-    businessLogic: {
+    逻辑: {
         [key: string]: {
             tagList: string[];
             content: HTMLElement;
         };
     };
-    UIAndUX: {
+    UI和UX: {
         [key: string]: {
             tagList: string[];
             content: HTMLElement;
         };
     };
-    jumpLink: {
-        [key: string]: {
-            tagList: string[];
-            content: string;
-        };
-    };
-    testCase: {
+    跳转链接: {
         [key: string]: {
             tagList: string[];
             content: string;
@@ -82,4 +75,4 @@ export interface State {
     };
 };
 
-export type functionType = "buriedPoint" | "ABTestCode" | "data" | "businessLogic" | "UIAndUX" | "jumpLink" | "testCase";
+export type functionType = "埋点" | "AB测试号" | "数据" | "逻辑" | "UI和UX" | "跳转链接";

@@ -1,3 +1,3 @@
-import TagNameList from "./tagNameList";
+import tagContainer from "./tagContainer";
 
-export { TagNameList };
+export { tagContainer };

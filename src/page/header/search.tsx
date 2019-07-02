@@ -1,56 +1,46 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { InputBase, ListItemText, MenuItem, Popover, Checkbox } from "@material-ui/core";
-import { Title, CropFree, SettingsEthernet, LocalOffer  } from "@material-ui/icons";
+import { Title, CropFree, SettingsEthernet, LocalOffer } from "@material-ui/icons";
+import { type } from '../../data/constant';
+import { update, map } from "little_bit";
+import { xor, uniq } from "lodash";
 
-export default function Input({ restTagList, setSearchTagList }: { restTagList: string[]; setSearchTagList: (tag: string) => void }) {
+interface IPropType {
+    tagList: string[];
+    searchTagList: string[];
+    setSearchTagList: React.Dispatch<React.SetStateAction<string[]>>;
+    textContainedList: string[];
+    setTextContainedList: React.Dispatch<React.SetStateAction<string[]>>;
+    functionTypeList: type.functionType[];
+    searchFunctionTypeList: type.functionType[];
+    setSearchFunctionTypeList: React.Dispatch<React.SetStateAction<type.functionType[]>>;
+}
+
+export default function Input({ tagList, searchTagList, setSearchTagList, textContainedList, setTextContainedList, functionTypeList, searchFunctionTypeList, setSearchFunctionTypeList }: IPropType) {
     const inputRef = useRef();
     const containerRef = useRef();
     type ITagType = "textContained" | "area" | "functionType" | "tag";
-    const [tagType, setTagType] = useState("textContained" as "textContained" | "area" | "functionType" | "tag");
-    const [tags, setTags] = useState({
-        textContained: [{
-            name: "apple",
-            selected: false,
-        },{
-            name: "banana",
-            selected: false,
-        },{
-            name: "pear",
-            selected: false,
-        }],
-        area: [{
-            name: "apple",
-            selected: false,
-        },{
-            name: "banana",
-            selected: false,
-        },{
-            name: "pear",
-            selected: false,
-        }],
-        functionType: [{
-            name: "apple",
-            selected: false,
-        },{
-            name: "banana",
-            selected: false,
-        },{
-            name: "pear",
-            selected: false,
-        }],
-        tag: [{
-            name: "apple",
-            selected: false,
-        },{
-            name: "banana",
-            selected: false,
-        },{
-            name: "pear",
-            selected: false,
-        }]
-    } as {[key: string]: Array<{ name: string, selected: boolean }>});
+    const [tagType, setTagType] = useState("textContained" as "textContained" | "functionType" | "tag");
     const [inputValue, setInputValue] = useState("");
-    const filteredTagList = tags[tagType].filter((item) => item.name.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
+    const typeObject = {
+        textContained: {
+            type: "input",
+            list: textContainedList.map((name) => ({ name, selected: true })),
+            set: setTextContainedList,
+        },
+        tag: {
+            type: "select",
+            list: tagList.map((name) => ({ name, selected: searchTagList.includes(name) })),
+            set: setSearchTagList,
+        },
+        functionType: {
+            type: "select",
+            list: functionTypeList.map((name) => ({ name, selected: searchFunctionTypeList.includes(name) })),
+            set: setSearchFunctionTypeList,
+        },
+    }
+    const filteredTypeObject: { type: "input" | "select", list: Array<{ name: string, selected: boolean }>, set: (selectedList: string[] | ((selectedList: string[]) => void)) => void } = update("list", (list: Array<{ name: string, selected: boolean }>) => list.filter(({ name }) => name.toLowerCase().indexOf(inputValue.toLowerCase()) > -1), typeObject[tagType]);
+    // the searchContent need to know the type: "selector" | "input" selected
     const [inputFocused, setInputFocused] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null as any);
     const open = Boolean(anchorEl);
@@ -61,31 +51,22 @@ export default function Input({ restTagList, setSearchTagList }: { restTagList: 
             document.body.removeEventListener("click", focus);
         }
     }, []);
-   
+
     const selectMenu = useCallback((tagType) => {
         setAnchorEl(null);
         setTagType(tagType);
     }, []);
     const TagIcon = {
         textContained: Title,
-        area: CropFree,
-        functionType: SettingsEthernet,
         tag: LocalOffer,
+        functionType: SettingsEthernet,
     }[tagType];
-
-    const toggleTag = useCallback((tagType: ITagType, tagName: string) => {
-        setTags((tags) => ({
-            ...tags,
-            [tagType]: tags[tagType].map((tag) => tag.name === tagName ? ({
-                name: tag.name,
-                selected: !tag.selected,
-            }) : tag),
-        }));
-    }, []);
+    // 先在这边进行架空tagList
+    tagList = ["苹果", "西瓜", "橘子"];
     return (
         <div
-            style={{ position: "absolute", top: 5, left: 10, width: 400, border: "1px solid #ccc", display: "flex", flexDirection: "column", alignItems: "flex-start", borderRadius: 20, boxShadow: "#aaa 0px 0px 3px", overflow: "hidden" }} 
-            
+            style={{ position: "absolute", top: 2.5, left: 10, width: 400, border: "1px solid #ccc", display: "flex", flexDirection: "column", alignItems: "flex-start", borderRadius: 20, boxShadow: "#aaa 0px 0px 3px", overflow: "hidden" }}
+
             ref={containerRef as any}
         >
             <div style={{ display: "flex", width: "100%", height: 40 }}>
@@ -108,10 +89,19 @@ export default function Input({ restTagList, setSearchTagList }: { restTagList: 
                         horizontal: 'right',
                     }}
                 >
-                    <MenuItem onClick={() => { selectMenu("textContained"); }}>文字片段</MenuItem>
-                    <MenuItem onClick={() => { selectMenu("area"); }}>区域</MenuItem>
-                    <MenuItem onClick={() => { selectMenu("functionType"); }}>功能区域</MenuItem>
-                    <MenuItem onClick={() => { selectMenu("tag"); }}>标签</MenuItem>
+                    <MenuItem onClick={() => { selectMenu("textContained"); }}>
+                        <Title style={{ color: "#948492" }} />
+                        文字
+                    </MenuItem>
+                    <MenuItem onClick={() => { selectMenu("tag"); }}>
+                        <LocalOffer style={{ color: "#948492" }} />
+                        标签
+                    </MenuItem>
+                    <MenuItem onClick={() => { selectMenu("functionType"); }}>
+                        <SettingsEthernet style={{ color: "#948492" }} />
+                        功能
+                    </MenuItem>
+
                 </Popover>
                 <InputBase
                     style={{ width: 360 }}
@@ -127,19 +117,20 @@ export default function Input({ restTagList, setSearchTagList }: { restTagList: 
                     }}
                     inputRef={inputRef}
                     onKeyDown={(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                        if (event.keyCode === 13) {
-                            setSearchTagList(inputValue);
+                        if (event.keyCode === 13 && inputValue.trim().length > 0 && filteredTypeObject.type === "input") {
+                            filteredTypeObject.set((prevList: string[]) => uniq([inputValue, ...prevList]));
                             (inputRef.current as any).value = "";
                             setInputValue("");
                         }
+                        // 如果没有不是input类型的数据则直接返回错误toast
                     }}
                 />
             </div>
-            <div style={{ width: "100%", backgroundColor: "white" }}>
+            <div style={{ width: "100%", backgroundColor: "white", maxHeight: 40 * 8, overflow: "scroll" }}>
                 {
-                    inputFocused && filteredTagList.map(({ name, selected }, index) => (
-                        <MenuItem style={{ width: "100%", height: 40, padding: 0 }} onClick={() => toggleTag(tagType, name)}>
-                            <Checkbox checked={selected} style={{ width: 40, height: 40, padding: 0, margin: 0 }}/>
+                    inputFocused && filteredTypeObject.list.map(({ name, selected }, index) => (
+                        <MenuItem style={{ width: "100%", height: 40, padding: 0 }} onClick={() => filteredTypeObject.set((prevList) => xor(prevList, [name]))}>
+                            <Checkbox checked={selected} style={{ width: 40, height: 40, padding: 0, margin: 0 }} />
                             <ListItemText primary={name} key={index} style={{ display: "flex", alignItems: "center", marginLeft: -16, height: 40, width: "100%", userSelect: "none" }} />
                         </MenuItem>
                     ))
